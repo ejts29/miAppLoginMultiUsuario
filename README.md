@@ -200,9 +200,9 @@ El video muestra:
 # Instalación y ejecución
 
 ### Clonar
+[![miAppLoginMultiUsuario](https://img.shields.io/badge/miAppLoginMultiUsuario-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ejts29/miAppLoginMultiUsuario)
 
 ```bash
-[![miAppLoginMultiUsuario](https://img.shields.io/badge/miAppLoginMultiUsuario-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ejts29/miAppLoginMultiUsuario)
 
 
 cd miAppLoginMultiUsuario
