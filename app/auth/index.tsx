@@ -1,5 +1,5 @@
 // app/auth/index.tsx
-
+// Daniel Castro: Comentario agregado para verificación de flujo de login.
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
