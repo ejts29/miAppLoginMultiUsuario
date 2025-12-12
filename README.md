@@ -1,58 +1,65 @@
 
+# 📱 **miAppLoginMultiUsuarioApi**
+
+Aplicación móvil desarrollada con **React Native + Expo + TypeScript**, completamente integrada con la **API REST oficial**:
+
+```
+https://todo-list.dobleb.cl/
+```
+
+El proyecto implementa:
+
+* Autenticación real con backend remoto (JWT).
+* Pantalla de Login y Registro conectadas al backend.
+* Navegación con Expo Router.
+* Contexto global de autenticación.
+* Módulo completo de TODOList con consumo de API:
+
+  * Listar tareas
+  * Crear tareas
+  * Modificar tareas
+  * Obtener ubicación
+  * Adjuntar imagen (como URL debido a restricciones del backend)
+  * Marcar como completadas
+  * Eliminar tareas
+
+Proyecto correspondiente a la **Evaluación 3**, demostrando integración completa con un servicio backend real, manejo de estado global, navegación, validaciones, consumo de API y arquitectura .
+
 ---
 
-# 📱 miAppLoginMultiUsuario
-
-Aplicación móvil desarrollada con **React Native + Expo** y **TypeScript**, que integra:
-
-* Pantalla de **Login** (Evaluación 1 revisada e integrada).
-* Sistema de **navegación avanzada** con Expo Router.
-* Sección principal con **Tabs** (Home / Perfil).
-* Módulo completo de **TODOList**, incluyendo:
-
-* creación de tareas,
-* foto desde cámara/galería,
-* obtención de localización,
-* marcado de completadas/no completadas,
-* eliminación,
-* y persistencia local con AsyncStorage + FileSystem.
-
-Proyecto correspondiente a la **Evaluación 2**, demostrando estructura profesional, manejo de estado, navegación, buenas prácticas, componentes reutilizables e integración de módulos nativos.
-
----
-
-## Objetivo académico
+## **Objetivo Académico**
 
 Demostrar dominio en:
 
-* Desarrollo móvil con **React Native + Expo**.
-* Uso de **TypeScript** en toda la lógica de la app.
-* Manejo de estado con **React Hooks**.
-* Persistencia local con **AsyncStorage**.
-* Navegación declarativa con **Expo Router**.
-* Implementación de un flujo completo: *login → tabs → tareas*.
-* Trabajo colaborativo con commits de múltiples integrantes.
+* Desarrollo móvil con React Native + Expo
+* Consumo de API REST con autenticación JWT
+* Manejo de estado global con Context API
+* Navegación declarativa con Expo Router
+* Tipado fuerte con TypeScript
+* Manejo de errores en llamadas HTTP
+* Flujo completo: **registro → login → home → lista de tareas → CRUD completo**
 
 ---
 
-## Tecnologías utilizadas
+## **Tecnologías Utilizadas**
 
-* **Expo**
-* **React Native**
-* **Expo Router**
-* **TypeScript**
-* **AsyncStorage**
-* **Expo Location**
-* **Expo ImagePicker**
-* **Expo FileSystem**
-* **@expo/vector-icons**
+* Expo
+* React Native
+* Expo Router
+* TypeScript
+* AsyncStorage
+* Expo Location
+* Expo ImagePicker
+* Fetch API
+* Context API
+* API REST del profesor (Hono + JWT)
 
 ---
 
-## Estructura principal del proyecto
+## **Estructura principal del proyecto**
 
-```bash
-miAppLoginMultiUsuario/
+```
+miAppLoginMultiUsuarioApi/
 ├─ app/
 │  ├─ _layout.tsx
 │  ├─ index.tsx
@@ -61,15 +68,20 @@ miAppLoginMultiUsuario/
 │  └─ home/
 │     ├─ _layout.tsx
 │     ├─ index.tsx
-│     └─ tareas/
+│     ├─ profile.tsx
+│     └─ todo-list/
 │        ├─ index.tsx
 │        └─ create.tsx
+│
 ├─ src/
-│  ├─ storage/
-│  │  ├─ userStorage.js
-│  │  └─ todolist.js
-│  └─ types/
-│     └─ todolist.ts
+│  ├─ context/
+│  │  └─ AuthContext.tsx
+│  └─ services/
+│     └─ api.ts
+│
+├─ types/
+│  └─ todolist.ts
+│
 ├─ app.json
 ├─ package.json
 ├─ tsconfig.json
@@ -78,176 +90,177 @@ miAppLoginMultiUsuario/
 
 ---
 
-# Funcionalidad de Login (Evaluación 1 integrada)
+## **Funcionalidad de Autenticación**
 
 La app incluye:
 
-* Campo **email**
-* Campo **password** (seguro)
-* Botón **Iniciar sesión**
-* Validación:
+* Campo email
+* Campo contraseña
+* Validaciones estrictas:
 
-  * Si la contraseña **≠ "1234"** → “Contraseña incorrecta”
-  * Si es correcta → pasa a la vista con Tabs
-* El usuario queda guardado en **AsyncStorage**
+  * Email debe tener formato válido → `usuario@dominio.com`
+  * Contraseña mínima: **6 caracteres** (según la  API )
 
-Luego se redirige automáticamente a:
+### Flujo
 
-* **Home** (bienvenida)
-* **Perfil** (muestra email del usuario)
-
----
-
-# Navegación con Expo Router
-
-* `app/_layout.tsx` controla el stack raíz
-* `app/index.tsx` decide si mostrar **login** o **home**
-* `app/home/_layout.tsx` organiza todas las pantallas internas
-* `app/home/index.tsx` contiene los **Tabs**
+1. Usuario se registra o inicia sesión.
+2. El backend responde con un token JWT.
+3. El token se guarda en AsyncStorage.
+4. La app redirige automáticamente a Home.
+5. Si no hay token → se muestra la pantalla de Login.
+6. Desde el perfil se puede cerrar sesión (limpia token y estado).
 
 ---
 
-# Módulo TODO List (Requerimiento principal)
+## **Navegación con Expo Router**
 
-Incluye:
-
-### Crear tareas con
-
-* Título (*obligatorio*)
-* Foto mediante **ImagePicker**
-* Ubicación usando **expo-location**
-* Guardado de foto en **FileSystem**
-* Guardado en persistencia local con AsyncStorage
-* Asociación automática al usuario **admin**
-
-### Funcionalidades
-
-* Listar tareas asociadas al usuario admin
-* Marcar como completada/no completada
-* Eliminar tareas
-* Persistencia entre sesiones
+* `app/_layout.tsx` controla el stack raíz y protege rutas.
+* `app/index.tsx` decide si ir a Login o Home.
+* `app/home/_layout.tsx` estructura las pantallas internas.
+* `app/home/index.tsx` muestra tabs y navegación.
+* `app/home/todo-list/` contiene el módulo completo de tareas.
 
 ---
 
-# Video demostrativo (Requisito de la evaluación)
+## **Módulo TODO List (CRUD Real)**
 
-**YouTube:**
-[https://youtu.be/1KYEbf2-Mac](https://youtu.be/1KYEbf2-Mac)
+### Listar tareas
 
-El video muestra:
+GET `/todos`
 
-1. Pantalla de Login
-2. Validación correcta / incorrecta
-3. Tabs Home y Perfil
-4. Todo List:
+### Crear tareas
 
-   * Crear una tarea con foto y ubicación
-   * Completar tareas
-   * Eliminar tareas
-5. Flujo completo funcionando
+POST `/todos`
+Se envía:
 
----
+* `title`
+* `location: { latitude, longitude }`
+* `photoUri` (como URL simulada por limitaciones del backend)
 
-# Integrantes del Grupo
+### Marcar tareas como completadas
 
-### **Efren Tovar**
+PATCH `/todos/:id`
 
-**Técnico dev**
+### Modificar tareas completadas
 
-* Configuración inicial del proyecto con Expo + TypeScript
-* Implementación completa de la lógica de login (Evaluación 1)
-* Integración del login al flujo de navegación con Expo Router
-* Desarrollo del TODO List:
-* formulario de creación
-* manejo de fotos con ImagePicker
-* localización con Expo Location
-* almacenamiento en FileSystem
-* persistencia en AsyncStorage
-* listados, completado y eliminado
-* Integración general, testing y refactor
+PATCH `/todos/:id`
 
-### **Eduardo Ahumada**
+### Eliminar tareas
 
-**Técnico dev Documentación y mejoras visuales**
+DELETE `/todos/:id`
 
-* Creación y edición del **README.md**
-* Ajustes de diseño de pantallas y estilo visual
-* Revisión de componentes, estructura y orden del código
-* Commit de documentación y mejoras
+### Actualización automática
 
-### **Daniel Castro**
-
-**Técnico dev Soporte y revisión**
-
-* Revisión del flujo de navegación entre pantallas y estructura del proyecto
-* Apoyo en pruebas de funcionamiento general y Evaluación del flujo entre pantallas
-* Observaciones sobre uso de buenas prácticas y estructura
-* Comentarios y observaciones del codigo
-
-### **Jeremy Sanhueza**
-
-**Técnico dev Soporte y revision**
-
-* Revisión general de navegación
-* Revisión visual de pantallas
-* Ajustes de interfaz
-* Apoyo en validación de rutas y flujos
-* Comentarios y observaciones del codigo
-* Desarrollo de El documento txt en pdf
+Cada acción refresca la lista.
 
 ---
 
-# Instalación y ejecución
+## **flujo del Video demostrativo**
 
-### Clonar
-[![miAppLoginMultiUsuario](https://img.shields.io/badge/miAppLoginMultiUsuario-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/ejts29/miAppLoginMultiUsuario)
+Debe mostrar:
 
-```bash
+* Registro
+* Login
+* Navegación protegida
+* Lista de tareas
+* modificar tarea
+* Crear tarea con ubicación e imagen
+* Completar / eliminar tareas
+* Logout
 
+*Cuando lo tengas, agrega el enlace aquí.*
 
-cd miAppLoginMultiUsuario
+---
+
+## **Integrantes del Grupo**
+
+## EFREN TOVAR
+
+* **Desarrollo Principal de la Aplicación:** Liderazgo en el desarrollo principal.
+* **Integración de API:** Integración completa con la API real del profesor.
+* **Autenticación y Navegación:**
+  * Implementación del flujo de **registro y login**.
+  * Configuración de **AuthContext**.
+  * Redirección protegida mediante **Expo Router**.
+* **Módulo Todo List:** Adaptación del módulo para cumplir con las **validaciones del backend**.
+* **Pruebas y Documentación:**
+  * Pruebas iniciales con **Postman**.
+  * Resolución de **errores HTTP**.
+  * Grabación del **video demostrativo**.
+  * Documentación técnica **inicial** del proyecto.
+
+---
+
+## EDUARDO AHUMADA
+
+* **Diseño y Estilos:**
+  * Revisión visual de pantallas.
+  * **Refinamiento de estilos**.
+* **Organización y Flujo:**
+  * Asistencia en la **organización del proyecto**.
+  * Revisión del **flujo de usuario**.
+  * Sugerencias de mejora en la **claridad del código**.
+* **Documentación y Pruebas:**
+  * Estructura del archivo **README**.
+  * Apoyo en **pruebas funcionales**.
+
+---
+
+## DANIEL CASTRO
+
+* **Verificación de Flujos:** Verificación del **flujo general entre pantallas**.
+* **Pruebas de Autenticación:** Pruebas del comportamiento del **AuthContext**.
+* **Arquitectura y Errores:**
+  * Rastreo de errores.
+  * Sugerencias de **arquitectura**.
+* **Validación de API:** Validación de las llamadas a la API (**GET, POST, PATCH, DELETE**).
+
+---
+
+## JEREMY SANHUEZA
+
+* **Validación de Seguridad:** Apoyo en validación de **rutas protegidas**.
+* **Revisión de Módulo:** Revisión visual del módulo **Todo List**.
+* **Pruebas Finales:**
+  * Pruebas finales del **flujo completo** (desde registro hasta CRUD de tareas).
+* **Documentación Final:** Documentación final (texto transcrito a **PDF**).---
+
+## **Instalación y ejecución**
+
+Clonar repo:
+
+```
+git clone https://github.com/ejts29/miAppLoginMultiUsuarioApi
+cd miAppLoginMultiUsuarioApi
 ```
 
-### Instalar dependencias
+Instalar dependencias:
 
-```bash
+```
 npm install
 ```
 
-### Ejecutar (Expo Go o Dev Client)
+Ejecutar:
 
-```bash
+```
 npx expo start
 ```
 
-o en Android:
+Android:
 
-```bash
+```
 npx expo run:android
 ```
 
 ---
 
-# Uso de IA en el proyecto
+## **Uso de IA en el proyecto**
 
-El grupo utilizó una IA generativa (ChatGPT) como apoyo para:
+La IA fue utilizada solo para:
 
-* Resolver errores de dependencias y configuración con Expo
-* Depurar comandos de consola
-* Reorganizar el proyecto y mejorar la arquitectura
-* Orientación técnica en el uso de FileSystem, AsyncStorage, Expo Router y TypeScript
+* Resolver errores complejos de integración
+* Mejorar arquitectura del proyecto
+* Redacción de documentación técnica
+* Depuración de validaciones y problemas con la API del profesor
 
-Todas las decisiones de implementación, pruebas finales y funcionamiento fueron realizadas por los integrantes del grupo.
-
----
-
-# Entrega EVA
-
-Archivo `.txt o pdf` incluirá:
-
-* Enlace al repositorio GitHub
-* Enlace al video YouTube
-* Integrantes completos
-* Descripción general de la aplicación
-
----
+Todas las decisiones finales y funcionalidades fueron implementadas y probadas por el alumno.
